@@ -349,7 +349,7 @@ function printImg($debut, $fin, $nav_width)
 	for($i=$debut;$i<$fin;$i++)
 	{
 		list($width, $height, $type, $attr) = getimagesize($array_path[$i]);
-		$array_width[$i]=round(($width*300)/$height,0,PHP_ROUND_HALF_UP);
+		$array_width[$i]=round(($width*300)/$height,0);
 		$sum_width=$sum_width+(($width*300)/$height);
 	}
 

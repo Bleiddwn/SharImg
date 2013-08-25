@@ -25,7 +25,7 @@ $NbFichier=0;
 			$NbFichier++; // On compte le nombre d'images
 			}
 		}
-	closedir('./img');
+	closedir('./img/');
 	}
 
 return $NbFichier;
@@ -45,7 +45,7 @@ $i=0;
 			$i++;
 			}
 		}
-		closedir('./img');
+		closedir('./img/');
 	}
 
 	array_multisort($array_path, SORT_DESC); // On classe les images dans l'ordre

@@ -16,7 +16,7 @@ function deleteCheckedFiles()
 function countImg()
 {
 $NbFichier=0;
-	if($dossier = opendir('./img'))
+	if ($dossier = opendir('./img'))
 	{
 		while(false !== ($fichier = readdir($dossier)))
 		{
@@ -25,7 +25,7 @@ $NbFichier=0;
 			$NbFichier++; // On compte le nombre d'images
 			}
 		}
-	closedir('./img/');
+	closedir($dossier);
 	}
 
 return $NbFichier;
@@ -58,7 +58,7 @@ function getUser()
 	if($config_file = fopen('config.php', 'rb'))
 	{
 		$user=fgets($config_file);
-		fclose('config.php');
+		fclose($config_file);
 		return $user;
 	}
 	else
@@ -71,14 +71,14 @@ function getPassword()
 	{
 		$password=fgets($config_file);
 		$password=fgets($config_file);
-		fclose('config.php');
+		fclose($config_file);
 		return $password;
 	}
 }
 
 function writeConfig($user, $password)
 {
-	if($config_file = fopen('config.php', 'w+b'))
+	if($config_file = @fopen('config.php', 'w+b'))
 	{
 		fputs($config_file, $user.PHP_EOL.$password);
 		fclose($config_file);
@@ -91,13 +91,9 @@ function writeConfig($user, $password)
 
 function isConfig()
 {
-	if($config_file = fopen('config.php', 'rb'))
+	if($config_file = @fopen('config.php', 'rb'))
 		return TRUE;
 	else
 		return FALSE;
 }
 	
-
-
-?>
-

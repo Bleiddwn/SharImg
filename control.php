@@ -28,110 +28,110 @@ function getDeleteCheckBox()
 
 
 function upload()
-{	
+{
 	$extension=array('png','gif','jpg','jpeg');
 
 	if(isset($_GET['url']))
 		$field ='URL : <input style="width: 500px;" type="text" name="image_url" style="color: black" value="'.$_GET['url'].'">';
-	
+
 	else
 		$field ='URL : <input style="width: 500px;" type="text" name="image_url" style="color: black">';
-	
+
 
 
 	echo '<form method="POST" action="upload.php?type=pc" enctype="multipart/form-data">
-              <fieldset>
-	      <legend>Télécharger une image de votre ordinateur</legend>
+		        <fieldset>
+			<legend>Télécharger une image de votre ordinateur</legend>
 
-              File : <input style="width: 500px;" type="file" name="image_pc" style="color: black">
-              <input style="float: right" type="submit" name="Upload" value="Upload">
-	      </fieldset>
+		        File : <input style="width: 500px;" type="file" name="image_pc" style="color: black">
+		        <input style="float: right" type="submit" name="Upload" value="Upload">
+			</fieldset>
 
-              </form><br/>
-              <form method="POST" action="upload.php?type=url" enctype="multipart/form-data">
-	      <fieldset>
-              <legend>Télécharger une image à partir d\'une URL</legend>'.
+		        </form><br/>
+		        <form method="POST" action="upload.php?type=url" enctype="multipart/form-data">
+			<fieldset>
+		        <legend>Télécharger une image à partir d\'une URL</legend>'.
 		$field
-	     .' <input style="float: right" type="submit" name="Upload" value="Upload">
-	      </fieldset>
-              </form><br/>';
+		  .' <input style="float: right" type="submit" name="Upload" value="Upload">
+			</fieldset>
+		        </form><br/>';
 
-	
-	if($_GET['type']=='pc')
+
+	if(isset($_GET['type']) and $_GET['type']=='pc')
 	{
-	if(isset($_FILES['image_pc']))
-	{ 
-     		$dossier = './img/';
-     		$fichier =  time().'_'.basename($_FILES['image_pc']['name']);	
-		$ext = substr(strrchr($_FILES['image_pc']['name'],'.'),1);
-
-		if(!in_array($ext,$extension))
-			echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
-		else	
-		{	
-			if(move_uploaded_file($_FILES['image_pc']['tmp_name'], $dossier . $fichier)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
-     			{	
-				echo '<h3>File uploaded !</h3>';
-				list($width, $height, $type, $attr) = getimagesize($dossier.$fichier);
-          			echo '[Name] '.$fichier.'<br/>';
-				echo '[Height] '.$height.'px<br/>';
-				echo '[Width] '.$width.'px<br/>';
-				echo '[URL] '.$dossier.$fichier.'<br/>';
-				echo '<center><img src="'.$dossier.$fichier.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
-	
-     			}
-     			else //Sinon (la fonction renvoie FALSE).
-     			{
-          			echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
-     			}	
-		}
-	}
-}
-
-if($_GET['type']=='url')
-{	
-
-	if(empty($_POST['image_url']))
-		echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
-	
-	else
-	{
-	
-		if($current = file_get_contents($_POST['image_url']))
-		{
-			$name = time().'_'.end(explode("/",$_POST['image_url']));
-			$ext = substr(strrchr($name,'.'),1);
+		if(isset($_FILES['image_pc']))
+		{ 
+		  		$dossier = './img/';
+		  		$fichier =  time().'_'.basename($_FILES['image_pc']['name']);	
+			$ext = substr(strrchr($_FILES['image_pc']['name'],'.'),1);
 
 			if(!in_array($ext,$extension))
 				echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
-			
-			else
-			{
-				$file = './img/'.$name;
-
-				if(file_put_contents($file, $current))
-				{
+			else	
+			{	
+				if(move_uploaded_file($_FILES['image_pc']['tmp_name'], $dossier . $fichier)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
+		  			{	
 					echo '<h3>File uploaded !</h3>';
-					list($width, $height, $type, $attr) = getimagesize($file);
-          				echo '[Name] '.$name.'<br/>';
+					list($width, $height, $type, $attr) = getimagesize($dossier.$fichier);
+			    			echo '[Name] '.$fichier.'<br/>';
 					echo '[Height] '.$height.'px<br/>';
 					echo '[Width] '.$width.'px<br/>';
-					echo '[URL] '.$file.'<br/>';
-					echo '<center><img src="'.$file.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
-				}
-				else //Sinon (la fonction renvoie FALSE).
-     				{
-          				echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
-     				}
-			}	
-		}
-		else
-		{
-			echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le site dont provient l\'image ne possède pas de dispositif anti-leech.';
+					echo '[URL] '.$dossier.$fichier.'<br/>';
+					echo '<center><img src="'.$dossier.$fichier.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
+
+		  			}
+		  			else //Sinon (la fonction renvoie FALSE).
+		  			{
+			    			echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
+		  			}	
+			}
 		}
 	}
 
-}
+	if(isset($_GET['type']) and $_GET['type']=='url')
+	{	
+
+		if(empty($_POST['image_url']))
+			echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
+
+		else
+		{
+
+			if($current = file_get_contents($_POST['image_url']))
+			{
+				$name = time().'_'.end(explode("/",$_POST['image_url']));
+				$ext = substr(strrchr($name,'.'),1);
+
+				if(!in_array($ext,$extension))
+					echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
+		
+				else
+				{
+					$file = './img/'.$name;
+
+					if(file_put_contents($file, $current))
+					{
+						echo '<h3>File uploaded !</h3>';
+						list($width, $height, $type, $attr) = getimagesize($file);
+			    				echo '[Name] '.$name.'<br/>';
+						echo '[Height] '.$height.'px<br/>';
+						echo '[Width] '.$width.'px<br/>';
+						echo '[URL] '.$file.'<br/>';
+						echo '<center><img src="'.$file.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
+					}
+					else //Sinon (la fonction renvoie FALSE).
+		  				{
+			    				echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
+		  				}
+				}	
+			}
+			else
+			{
+				echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le site dont provient l\'image ne possède pas de dispositif anti-leech.';
+			}
+		}
+
+	}
 	
 
 

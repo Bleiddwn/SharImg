@@ -14,4 +14,4 @@ include_once('./inc/header.php'); ?>
 </div>
 <div id="page">...</div>
 
-<? include_once('./inc/footer.php');?>
+<?php include_once('./inc/footer.php');

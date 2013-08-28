@@ -2,7 +2,7 @@
 include_once('control.php');
 
 include_once('./inc/header.php'); ?>
-<div id="page">Deconnection</div>
+<div id="page">Deconnexion</div>
 <div id="main">
 <?php
 

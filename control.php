@@ -56,7 +56,8 @@ function upload()
 	      </fieldset>
               </form><br/>';
 
-	
+	if(isset($_GET['type']))
+	{
 	if($_GET['type']=='pc')
 	{
 	if(isset($_FILES['image_pc']))
@@ -86,6 +87,7 @@ function upload()
      			}	
 		}
 	}
+	
 }
 
 if($_GET['type']=='url')
@@ -131,6 +133,7 @@ if($_GET['type']=='url')
 		}
 	}
 
+}
 }
 	
 
@@ -203,11 +206,11 @@ function print_Login()
 {
 	if (isset($_SESSION['pseudo']) )
 	{
-		return $_SESSION['pseudo'].' <a href="logout.php"><strong>[Deconnection]</strong></a>';
+		return $_SESSION['pseudo'].' <a href="logout.php"><strong>[Deconnexion]</strong></a>';
 	}
 	else
 	{
-		return '<a href="login.php"><strong>[Connection]</strong></a>';
+		return '<a href="login.php"><strong>[Connexion]</strong></a>';
 	}
 }
 
@@ -262,29 +265,36 @@ function linear_partition_table($seq, $k) // Fonction chargée d'effectuée la p
 	   	$solution[$i][$j]=0; 
 		}
 	} 
-
-	for($i=0; $i<=$n; $i++)
+	
+	
+	for($i=0; $i<$n; $i++)
 	{
-		$table[$i][0] = $seq[$i] +  $table[$i-1][0];
+		if ($i==0)
+			$a=0;
+		else
+			$a=$table[$i-1][0]; // Pour gérer l'exeption $i=0;
+
+		$table[$i][0] = $seq[$i] +  $a;
 	}
 
-	for($j=0; $j<=$k; $j++)
+	for($j=0; $j<$k; $j++)
 	{
 		$table[0][$j] = $seq[0];
 	}
 
 
-	for($i=1; $i<=$n; $i++)
+	for($i=1; $i<$n; $i++)
 	{
-		for($j=1; $j<=$k; $j++)
+		for($j=1; $j<$k; $j++)
 		{
-			for($x=0; $x<=$i; $x++)	
+			for($x=0; $x<$i; $x++)	
 			{
 				$use[$x]=max($table[$x][$j-1], $table[$i][0]-$table[$x][0]);
 			}
 
 		$table[$i][$j]=min($use);
-		$solution[$i-1][$j-1]=array_search(min($use), $use);		
+		$solution[$i-1][$j-1]=array_search(min($use), $use);	
+		
 		}
 	}
 
@@ -344,7 +354,7 @@ function printImg($debut, $fin, $nav_width)
 	{
 	$array_path=getImgPath();
 
-	$SumWidth=0;
+	$sum_width=0;
 
 	for($i=$debut;$i<$fin;$i++)
 	{
@@ -364,7 +374,7 @@ function printImg($debut, $fin, $nav_width)
 	//							      $LigneWidth[1]=789.10.34
 	//							      $LigneWidth[2]=1337.42	
 	$u=$debut;
-	
+	$final_string="";
 	for($i=0;$i<$k;$i++) // Pour chaque ligne
 	{
 		$img_width=explode('.',$array_line_width[$i]); // Contient la largeur des images de la ligne $i
@@ -372,7 +382,7 @@ function printImg($debut, $fin, $nav_width)
 						      // La largeur du navigateur MOINS largeur par de scroll (15px) MOINS (nombre d'images de la ligne + 1)*5
 		$sum=array_sum($img_width);
 
-/* 
+/* 	
    On a la largeur disponible pour les images ($width_available), ainsi que la somme des largeurs des images de la ligne ($sum).
    Il s'agit maintenant de redimensionner les images de la ligne en modulant leur hauteur afin qu'elles s'encastrent parfaitement.
    On utilise pour cela une simple règle de trois.
@@ -381,7 +391,7 @@ function printImg($debut, $fin, $nav_width)
 
 		foreach($img_width as $image) // Pour chaque image...
 		{
-			$width_ok=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
+			$ok_width=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
 			$final_string=$final_string.'<a href="'.$array_path[$u].'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$ok_width.'" /></a>'; // On affiche l'image.
 			$u++;
 		}

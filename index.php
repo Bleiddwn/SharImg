@@ -14,6 +14,9 @@ include_once('model.php');
 include_once('control.php');
 
 include_once('./inc/header.php');
+
+$nav_width=$_GET['NavWidth'];
+
 ?>
 <script language="JavaScript">
 

@@ -8,7 +8,7 @@
 <body>
 
 
-<?php $nav_width=$_GET['NavWidth']; ?>
+
 
 
 <div id="header">

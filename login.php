@@ -2,7 +2,7 @@
 include_once('control.php');
 
 include_once('./inc/header.php'); ?>
-<div id="page">Connection</div>
+<div id="page">Connexion</div>
 <div id="main">
 <?php
 

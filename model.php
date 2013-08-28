@@ -7,7 +7,7 @@ function deleteCheckedFiles()
 
 	for($i=0;$i<count($array_name);$i++)
 	{
-		if($_POST[$i]=='on')	
+		if(isset($_POST[$i]))
 		{
 			unlink($array_name[$i]);
 		}
@@ -25,7 +25,7 @@ $NbFichier=0;
 			$NbFichier++; // On compte le nombre d'images
 			}
 		}
-	closedir('./img/');
+	closedir($dossier);
 	}
 
 return $NbFichier;
@@ -45,7 +45,7 @@ $i=0;
 			$i++;
 			}
 		}
-		closedir('./img/');
+		closedir($dossier);
 	}
 
 	array_multisort($array_path, SORT_DESC); // On classe les images dans l'ordre

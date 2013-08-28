@@ -6,7 +6,6 @@ margin: 0px;
  img
 {
 margin: 0px;
-margin-left: 5px;
 }
 a img
 {
@@ -127,6 +126,58 @@ background-image: url('delete_icone_hover.png');
 }
 .image
 {
-margin-left: 5px;
 display: inline-block;
+
+}
+.txt
+{
+
+opacity: 0;
+background-color: rgba(0, 0, 0, 0);
+color: transparent;
+display:inline-block;
+font-size: 12px;
+font-family: Arial;
+position: absolute; 
+
+}
+.txt:hover
+{
+opacity: 1;
+background-color: rgba(0, 0, 0, 0.8);
+color: white;
+}
+.txt_nom
+{
+font-size: 13px;
+overflow: hidden;
+margin: 10px;
+font-weight: bold;
+}
+.txt_nom a
+{
+text-decoration: none;
+color: white;
+
+}
+.txt_nom a:hover
+{
+text-decoration: underline;
+}
+.txt_description
+{
+margin-right: 10px;
+margin-left: 10px;
+}
+
+.suppr
+{
+float: right;
+background-image: url('delete_icone.png');
+height: 20px;
+width: 20px;
+}
+.suppr:hover
+{
+background-image: url('delete_icone_hover.png');
 }

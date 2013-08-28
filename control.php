@@ -1,5 +1,6 @@
 <?php
 
+
 function getDeleteCheckBox()
 {
 	$output='<form action="delete.php" method="post" enctype="multipart/form-data">';
@@ -17,16 +18,6 @@ function getDeleteCheckBox()
 		
 
 	
-           
-
-	
-
-
-
-
-
-
-
 function upload()
 {	
 	$extension=array('png','gif','jpg','jpeg');
@@ -35,7 +26,7 @@ function upload()
 		$field ='URL : <input style="width: 500px;" type="text" name="image_url" style="color: black" value="'.$_GET['url'].'">';
 	
 	else
-		$field ='URL : <input style="width: 500px;" type="text" name="image_url" style="color: black">';
+		$field ='URL : <input style="width: 500px;" type="textarea" name="image_url" style="color: black">';
 	
 
 
@@ -43,7 +34,9 @@ function upload()
               <fieldset>
 	      <legend>Télécharger une image de votre ordinateur</legend>
 
-              File : <input style="width: 500px;" type="file" name="image_pc" style="color: black">
+              Fichier : <input style="width: 500px;" type="file" name="image_pc" style="color: black"><br/>
+              Description : <textarea style="width: 500px;" name="description" style="color: black"></textarea>
+				
               <input style="float: right" type="submit" name="Upload" value="Upload">
 	      </fieldset>
 
@@ -72,6 +65,8 @@ function upload()
 		{	
 			if(move_uploaded_file($_FILES['image_pc']['tmp_name'], $dossier . $fichier)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
      			{	
+				WriteXML($_FILES['image_pc']['name'], $_POST['description']);
+
 				echo '<h3>File uploaded !</h3>';
 				list($width, $height, $type, $attr) = getimagesize($dossier.$fichier);
           			echo '[Name] '.$fichier.'<br/>';
@@ -391,14 +386,17 @@ function printImg($debut, $fin, $nav_width)
 
 		foreach($img_width as $image) // Pour chaque image...
 		{
+			$info=getImgInfo($u);
 			$width_ok=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
 			if(isLogin())
-				$final_string=$final_string.'<span style="width:'.$width_ok.'px;" class="image"><a class="supprimg" href="delete.php?url='.$array_path[$u].'"></a><a href="'.$array_path[$u].'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></a></span>'; // On affiche l'image.
+				$final_string=$final_string.'
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt"><a href="delete.php?id='.$u.'" class="suppr"></a>	 <div class="txt_nom"><a href="img.php?id='.$u.'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';
+				 // On affiche l'image.
+				// Le '(countImg()-$u-1)' est crade. Je verrai si c'est fiable à long terme.
 			else
-				$final_string=$final_string.'<span class="image"><a href="'.$array_path[$u].'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></a></span>'; // On affiche l'image.
+				$final_string=$final_string.'<span class="image"><a href="img.php?id='.$u.'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></a></span>'; // On affiche l'image.
 			$u++;
 		}
-		
 
 
 	}

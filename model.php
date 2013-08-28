@@ -1,24 +1,74 @@
 <?php
 session_start();
 
-function deleteImg($img_path)
+// Toutes les fonctions permettant la gestion du fichier XML et des images
+function WriteXML($nom, $description)
 {
-unlink($img_path);
-return 0;
-}
+$xml=new DomDocument('1.0');
 
-function deleteCheckedFiles()
-{
-	$array_name=getImgPath();
-
-	for($i=0;$i<count($array_name);$i++)
+	if($xml->load("imagesXML.xml"))
 	{
-		if(isset($_POST[$i]))
-		{
-			unlink($array_name[$i]);
-		}
-	}
+	$racine=$xml->documentElement;
+	$image=$xml->createElement("image"); // On crée <image></image>
+	
+	$IMGname=$xml->createElement("name");	//On crée <name></name>
+	$IMGname->appendChild($xml->createTextNode($nom));
+	
+	$IMGdescription=$xml->createElement("description");	
+	$IMGdescription->appendChild($xml->createTextNode($description));
+	
+	$IMGtimestamp=$xml->createElement("timestamp");	
+	$IMGtimestamp->appendChild($xml->createTextNode(time()));
+	
+	$image->appendChild($IMGname);
+	$image->appendChild($IMGdescription);
+	$image->appendChild($IMGtimestamp);
+	$bar = $xml->documentElement->firstChild;
+
+	 $racine->insertBefore($image, $racine->firstChild); 
+
+//	$xml->documentElement->appendChild($image);
+	$chaineXML=$xml->saveXML();
+	
+
+	echo $chaineXML;
+//	print_r($xml);
+	$xml->save("imagesXML.xml");
+
+
 }
+
+
+return TRUE;
+}
+
+function getImgInfo($id)
+{
+	$info=Array();
+	$img_id=intval($id);
+	$xml = simplexml_load_file("imagesXML.xml");
+	$info['name']=$xml->image[$img_id]->name;
+	$info['description']=$xml->image[$img_id]->description;
+	$info['timestamp']=$xml->image[$img_id]->timestamp;
+
+	return $info;
+}
+function deleteImgXML($id)
+{
+
+	$img_id=intval($id);
+
+		$xdoc = new DOMDocument();
+	$xdoc->load('imagesXML.xml');
+	$documentElement = $xdoc->documentElement;
+	$item0 = $xdoc->getElementsByTagName("image")->item($img_id);
+	
+	$documentElement->removeChild($item0);
+	$xdoc->save("imagesXML.xml");
+
+}
+		
+
 function countImg()
 {
 $NbFichier=0;
@@ -36,6 +86,28 @@ $NbFichier=0;
 
 return $NbFichier;
 }
+
+
+function deleteImg($img_id)
+{
+$path=getImgPath();
+unlink($path[$img_id]);
+return 0;
+}
+
+function deleteCheckedFiles()
+{
+	$array_name=getImgPath();
+
+	for($i=0;$i<count($array_name);$i++)
+	{
+		if(isset($_POST[$i]))
+		{
+			unlink($array_name[$i]);
+		}
+	}
+}
+
 
 function getImgPath()
 {
@@ -58,6 +130,8 @@ $i=0;
 	
 	return $array_path;
 }
+
+	
 
 function getUser()
 {
@@ -103,7 +177,4 @@ function isConfig()
 		return FALSE;
 }
 	
-
-
-
 

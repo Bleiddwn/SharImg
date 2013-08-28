@@ -13,9 +13,10 @@ include_once('./inc/header.php'); ?>
 	
 	else 
 	{
-		if(!empty($_GET['url']))
+		if(!empty($_GET['id']))
 		{	
-			deleteImg($_GET['url']);
+			deleteImg($_GET['id']);
+			deleteImgXML($_GET['id']);
 			echo '<script language="JavaScript">window.location="index.php"</script>';
 		}
 		else

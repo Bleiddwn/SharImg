@@ -363,7 +363,7 @@ function printImg($debut, $fin, $nav_width)
 		$sum_width=$sum_width+(($width*300)/$height);
 	}
 
-	$k=round($sum_width/$nav_width,0,PHP_ROUND_HALF_UP); // $k représente le nombre de "lignes" qui seront affichées.
+	$k=round($sum_width/$nav_width,0); // $k représente le nombre de "lignes" qui seront affichées.
 
 	$partition=linear_partition_table(array_values($array_width), $k);
 

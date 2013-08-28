@@ -58,7 +58,7 @@ function getUser()
 	if($config_file = fopen('config.php', 'rb'))
 	{
 		$user=fgets($config_file);
-		fclose('config.php');
+		fclose($config_file);
 		return $user;
 	}
 	else
@@ -71,7 +71,7 @@ function getPassword()
 	{
 		$password=fgets($config_file);
 		$password=fgets($config_file);
-		fclose('config.php');
+		fclose($config_file);
 		return $password;
 	}
 }
@@ -91,7 +91,7 @@ function writeConfig($user, $password)
 
 function isConfig()
 {
-	if($config_file = fopen('config.php', 'rb'))
+	if(file_exists('config.php'))
 		return TRUE;
 	else
 		return FALSE;

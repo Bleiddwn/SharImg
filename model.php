@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+function deleteImg($img_path)
+{
+unlink($img_path);
+return 0;
+}
+
 function deleteCheckedFiles()
 {
 	$array_name=getImgPath();

@@ -391,8 +391,11 @@ function printImg($debut, $fin, $nav_width)
 
 		foreach($img_width as $image) // Pour chaque image...
 		{
-			$ok_width=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
-			$final_string=$final_string.'<a href="'.$array_path[$u].'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$ok_width.'" /></a>'; // On affiche l'image.
+			$width_ok=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
+			if(isLogin())
+				$final_string=$final_string.'<span style="width:'.$width_ok.'px;" class="image"><a class="supprimg" href="delete.php?url='.$array_path[$u].'"></a><a href="'.$array_path[$u].'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></a></span>'; // On affiche l'image.
+			else
+				$final_string=$final_string.'<span class="image"><a href="'.$array_path[$u].'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></a></span>'; // On affiche l'image.
 			$u++;
 		}
 		

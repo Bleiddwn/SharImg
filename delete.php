@@ -13,8 +13,16 @@ include_once('./inc/header.php'); ?>
 	
 	else 
 	{
-		deleteCheckedFiles();
-		echo getDeleteCheckBox();
+		if(!empty($_GET['url']))
+		{	
+			deleteImg($_GET['url']);
+			echo '<script language="JavaScript">window.location="index.php"</script>';
+		}
+		else
+		{
+			deleteCheckedFiles();
+			echo getDeleteCheckBox();
+		}
 
 	}
 ?>

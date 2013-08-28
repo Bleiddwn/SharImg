@@ -112,3 +112,21 @@ margin-bottom: 3px;
 text-decoration: none;
 color: white;
 }
+.supprimg
+{
+margin-top: 5px;
+margin-left: 10px;
+height: 25px;
+width: 25px;
+position: absolute;
+background-image: url('delete_icone.png');
+}
+.supprimg:hover
+{
+background-image: url('delete_icone_hover.png');
+}
+.image
+{
+margin-left: 5px;
+display: inline-block;
+}

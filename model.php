@@ -69,8 +69,8 @@ function getPassword()
 {
 	if($config_file = fopen('config.php', 'rb'))
 	{
-		$password=fgets($config_file);
-		$password=fgets($config_file);
+		$password = fgets($config_file);
+		$password = fgets($config_file);
 		fclose('config.php');
 		return $password;
 	}
@@ -82,19 +82,19 @@ function writeConfig($user, $password)
 	{
 		fputs($config_file, $user.PHP_EOL.$password);
 		fclose($config_file);
-		return TRUE;
+		return true;
 	}
-	else
-		return FALSE;
+	return false;
 	
 }
 
 function isConfig()
 {
 	if($config_file = fopen('config.php', 'rb'))
-		return TRUE;
-	else
-		return FALSE;
+	{
+		return true;
+	}
+	return false;
 }
 	
 

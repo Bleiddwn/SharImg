@@ -1,6 +1,6 @@
 <?php
-
-//
+// En fait je viens d'éditer ce fichier en mode expérimental !
+//Encore et encore :)
 // [SharImg] 
 // Un moyen simple de partager vos images.
 //

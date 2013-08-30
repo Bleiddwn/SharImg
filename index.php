@@ -61,8 +61,9 @@ if(!isConfig())
 else
 {
 printPage();
-
+echo '<div id="content">';
 echo printImg($debut, $fin, $nav_width);
+echo '</div>';
 printPage();
 }
 

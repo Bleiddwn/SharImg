@@ -53,6 +53,10 @@ border-radius: 2px;
 background-color: white;
 height: 6px;
 }
+#content
+{
+margin-left: 5px;
+}
 #main
 {
 font-size: 14px;

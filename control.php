@@ -17,127 +17,144 @@ function getDeleteCheckBox()
 
 		
 
-	
 function upload()
-{	
-	$extension=array('png','gif','jpg','jpeg');
-
-	if(isset($_GET['url']))
-		$field ='URL : <input style="width: 500px;" type="text" name="image_url" style="color: black" value="'.$_GET['url'].'">';
-	
-	else
-		$field ='URL : <input style="width: 500px;" type="textarea" name="image_url" style="color: black">';
-	
-
-
-	echo '<form method="POST" action="upload.php?type=pc" enctype="multipart/form-data">
-              <fieldset>
-	      <legend>Télécharger une image de votre ordinateur</legend>
-
-              Fichier : <input style="width: 500px;" type="file" name="image_pc" style="color: black"><br/>
-              Description : <textarea style="width: 500px;" name="description" style="color: black"></textarea>
-				
-              <input style="float: right" type="submit" name="Upload" value="Upload">
-	      </fieldset>
-
-              </form><br/>
-              <form method="POST" action="upload.php?type=url" enctype="multipart/form-data">
-	      <fieldset>
-              <legend>Télécharger une image à partir d\'une URL</legend>'.
-		$field
-	     .' <input style="float: right" type="submit" name="Upload" value="Upload">
-	      </fieldset>
-              </form><br/>';
-
-	if(isset($_GET['type']))
+{
+	if(!(isset($_GET['type'])) || $_GET['type']=='PC')
 	{
-	if($_GET['type']=='pc')
-	{
-	if(isset($_FILES['image_pc']))
-	{ 
-     		$dossier = './img/';
-     		$fichier =  time().'_'.basename($_FILES['image_pc']['name']);	
-		$ext = substr(strrchr($_FILES['image_pc']['name'],'.'),1);
-
-		if(!in_array($ext,$extension))
-			echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
-		else	
-		{	
-			if(move_uploaded_file($_FILES['image_pc']['tmp_name'], $dossier . $fichier)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
-     			{	
-				WriteXML($_FILES['image_pc']['name'], $_POST['description']);
-
-				echo '<h3>File uploaded !</h3>';
-				list($width, $height, $type, $attr) = getimagesize($dossier.$fichier);
-          			echo '[Name] '.$fichier.'<br/>';
-				echo '[Height] '.$height.'px<br/>';
-				echo '[Width] '.$width.'px<br/>';
-				echo '[URL] '.$dossier.$fichier.'<br/>';
-				echo '<center><img src="'.$dossier.$fichier.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
-	
-     			}
-     			else //Sinon (la fonction renvoie FALSE).
-     			{
-          			echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
-     			}	
-		}
+	uploadPC();
 	}
-	
+	else
+	{
+	uploadURL();
+	}
 }
 
-if($_GET['type']=='url')
-{	
+function uploadPC()
+{
+echo '<form method="POST" action="upload.php?type=PC" enctype="multipart/form-data">
+		<fieldset>
+			<legend>Télécharger une image à partir de votre ordinateur - <a style="font-size: 9px;" href="upload.php?type=URL">Télécharger une image à partir d\'une URL</a></legend><br/>
 
-	if(empty($_POST['image_url']))
-		echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
+              Fichier : <input style="width: 500px;" type="file" name="imgPC" style="color: black"><br/><br/>
+			  Nom (sans extension) :
+			  <div style="font-size: 9px;">Si le champ est laissé vide, le nom sera celui du fichier uploadé </div>
+			  <div style="font-size: 9px;">Les espaces seront remplacés par le caractère \'_\'</div>
+			  <input style="width: 500px;" type="textarea" name="imgName" style="color: black"><br/><br/>
+              Description : <br/><textarea style="width: 500px;" name="imgDescription" style="color: black"></textarea>
+				
+              <input style="float: right" type="submit" name="Upload" value="Upload">
+	     </fieldset>
+       </form>';
+       
+       
+if(isset($_FILES['imgPC']))
+{
+	$extension=array('png','gif','jpg','jpeg');
+	$ext = substr(strrchr($_FILES['imgPC']['name'],'.'),1);
 	
+	
+	if(!in_array($ext,$extension))
+	{
+		echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
+	}
 	else
 	{
-	
-		if($current = file_get_contents($_POST['image_url']))
+		if(empty($_POST['imgName']))
 		{
-			$name = time().'_'.end(explode("/",$_POST['image_url']));
-			$ext = substr(strrchr($name,'.'),1);
-
-			if(!in_array($ext,$extension))
-				echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
-			
-			else
-			{
-				$file = './img/'.$name;
-
-				if(file_put_contents($file, $current))
-				{
-					echo '<h3>File uploaded !</h3>';
-					list($width, $height, $type, $attr) = getimagesize($file);
-          				echo '[Name] '.$name.'<br/>';
-					echo '[Height] '.$height.'px<br/>';
-					echo '[Width] '.$width.'px<br/>';
-					echo '[URL] '.$file.'<br/>';
-					echo '<center><img src="'.$file.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
-				}
-				else //Sinon (la fonction renvoie FALSE).
-     				{
-          				echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
-     				}
-			}	
+		$name=time().'_'.basename($_FILES['imgPC']['name']);
 		}
 		else
 		{
-			echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le site dont provient l\'image ne possède pas de dispositif anti-leech.';
+		$name=time().'_'.str_replace(' ','_',$_POST['imgName']).'.'.$ext;
 		}
+		
+		if(move_uploaded_file($_FILES['imgPC']['tmp_name'], './img/'.$name)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
+     	{	
+			WriteXML($name, $_POST['imgDescription']);
+			list($width, $height, $type, $attr) = getimagesize('./img/'.$name);
+
+				echo '<h3>File uploaded !</h3>';
+          		echo '[Name] '.$name.'<br/>';
+				echo '[Height] '.$height.'px<br/>';
+				echo '[Width] '.$width.'px<br/>';
+				echo '<center><img src="./img/'.$name.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
+	
+     	}
+     	else //Sinon (la fonction renvoie FALSE).
+     	{
+				echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
+     	}	
 	}
 
 }
+return 0;
 }
+
+
+
+function uploadURL()
+{
+		$extension=array('png','gif','jpg','jpeg');
+
+echo'	   <form method="POST" action="upload.php?type=URL" enctype="multipart/form-data">
+	      <fieldset>
+	<legend> Télécharger une image à partir d\'une URL - <a href="upload.php?type=PC" style="font-size: 9px;">Télécharger une image à partir de votre ordinateur</a></legend>    <br/>          
+	URL : <input style="width: 500px;" type="textarea" name="imgURL" style="color: black"><br/><br/>
+	        Nom (sans extension) :
+			  <div style="font-size: 9px;">Si le champ est laissé vide, le nom sera celui du fichier uploadé </div>
+			  <div style="font-size: 9px;">Les espaces seront remplacés par le caractère \'_\'</div>
+			  <input style="width: 500px;" type="textarea" name="imgName" style="color: black"><br/><br/>
+              Description : <br/><textarea style="width: 500px;" name="imgDescription" style="color: black"></textarea><input style="float: right" type="submit" name="Upload" value="Upload">
+	      </fieldset>
+              </form><br/>';
+              
+if(empty($_POST['imgURL']))
+{
+	echo 'Merci de spécifier une URL !';
+}
+else
+{
+	if($current = file_get_contents($_POST['imgURL']))
+	{
+		$extension=array('png','gif','jpg','jpeg');
+		$ext = substr(strrchr($_POST['imgURL'],'.'),1);
+		
+		if(!in_array($ext,$extension))
+		{
+			echo '<strong>[Erreur]</strong> Ce fichier ne semble pas être une image (.png .gif .jpeg .jpg)';
+		}
+		else
+		{
+			if(empty($_POST['imgName']))
+			{
+				$name=time().'_'.end(explode("/",$_POST['imgURL']));
+			}
+			else
+			{
+				$name=time().'_'.str_replace(' ','_',$_POST['imgName']).'.'.$ext;
+			}
+			
+			if(file_put_contents('./img/'.$name, $current))
+			{
+				WriteXML($name, $_POST['imgDescription']);
+
+				echo '<h3>File uploaded !</h3>';
+				list($width, $height, $type, $attr) = getimagesize('./img/'.$name);
+          		echo '[Name] '.$name.'<br/>';
+				echo '[Height] '.$height.'px<br/>';
+				echo '[Width] '.$width.'px<br/>';
+				echo '<center><img src="./img/'.$name.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
+			}
 	
-
+			else //Sinon (la fonction renvoie FALSE).
+     		{
+          		echo '<strong>[Erreur]</strong> Echec de l\'upload ! Assurez-vous que le dossier ./img est accessible en écriture.';
+     		}
+     	}
+     }
 
 }
-
-   
-
-
+}			
 
 
 function connection()
@@ -348,7 +365,6 @@ function printImg($debut, $fin, $nav_width)
 	else
 	{
 	$array_path=getImgPath();
-
 	$sum_width=0;
 
 	for($i=$debut;$i<$fin;$i++)
@@ -390,12 +406,12 @@ function printImg($debut, $fin, $nav_width)
 			$width_ok=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
 			if(isLogin())
 				$final_string=$final_string.'
-		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt"><a href="delete.php?id='.$u.'" class="suppr"></a>	 <div class="txt_nom"><a href="img.php?id='.$u.'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt"><a href="delete.php?id='.$u.'" class="suppr"></a>	 <div class="txt_nom"><a href="img.php?name='.substr(strrchr($array_path[$u],'/'),1).'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';
 				 // On affiche l'image.
 				// Le '(countImg()-$u-1)' est crade. Je verrai si c'est fiable à long terme.
 			else
-				$final_string=$final_string.'<span class="image"><a href="img.php?id='.$u.'"><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></a></span>'; // On affiche l'image.
-			$u++;
+	$final_string=$final_string.'
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt">	 <div class="txt_nom"><a href="img.php?id='.$u.'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';			$u++;
 		}
 
 
@@ -405,7 +421,7 @@ return $final_string;
 }
 
 // Gestion des pages
-$pagination=15	;
+$pagination=20	;
 $nb_fichier=countImg();
 
 if( isset($_GET['page']) && is_numeric($_GET['page']) )

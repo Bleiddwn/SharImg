@@ -185,3 +185,22 @@ width: 20px;
 {
 background-image: url('delete_icone_hover.png');
 }
+
+.txt_nom_cat
+{
+text-align: center;
+font-size: 30px;
+overflow: hidden;
+margin: 10px;
+font-weight: bold;
+}
+.txt_nom_cat a
+{
+text-decoration: none;
+color: white;
+
+}
+.txt_nom_cat a:hover
+{
+text-decoration: underline;
+}

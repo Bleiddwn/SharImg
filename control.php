@@ -1,21 +1,46 @@
 <?php
-
-
-function getDeleteCheckBox()
-{
-	$output='<form action="delete.php" method="post" enctype="multipart/form-data">';
-
- 	$array_name=getImgPath();
-	for($i=0;$i<count($array_name);$i++)
-		$output.='<input type="checkbox" name="'.$i.'" id="'.$array_name[$i].'"/> <label for="'.$array_name[$i].'"><a href="'.$array_name[$i].'">'.$array_name[$i].'</a></label><br/>';
 	
-	$output.='<br/><input type="submit" value="Supprimer les images cochées" /><br/></form>';
+function AddCat() // Affiche et traite la page permettant d'ajouter une catégorie
+{
+$baseXML='<?xml version="1.0"?><images></images>';
 
-	return $output;
+echo '<form method="POST" action="cat.php" enctype="multipart/form-data">
+		<fieldset>
+			<legend>Créer une nouvelle catégorie</legend><br/>
+			
+			  Nom de la catégorie :
+			  <div style="font-size: 9px;">Les espaces seront remplacés par le caractère \'_\'</div>
+			  <div style="font-size: 9px;">N\'utilisez que des caractères alphanumériques. Sinon, ça plantera, et ce sera votre faute !</div>
 
-}
+			  <input style="width: 500px;" type="textarea" name="catName" style="color: black"><br/>
+             
+				
+              <input style="float: right" type="submit" name="Upload" value="Créer">
+	     </fieldset>
+       </form>';
+       
+       
+       if(!empty($_POST['catName']))
+       {
+		   $cn=str_replace(' ','_',$_POST['catName']);
+		   if(!(mkdir('./c/'.$cn, 0777)))
+		   {
+			   echo 'Impossible de créer le dossier ./c/'.$cn.'.';
+		   }
+		   else
+		   {
+				if($fileXML=fopen('./c/'.$cn.'/imagesXML.xml', "w+"))
+				{
+					fwrite($fileXML, $baseXML);
+					echo '<br/><strong>Nouvelle catégorie crée</strong><br/><br/>';
+				}
+			}
+		}
+return 0;
 
-		
+		   
+}	
+
 
 function upload()
 {
@@ -39,13 +64,20 @@ echo '<form method="POST" action="upload.php?type=PC" enctype="multipart/form-da
 			  Nom (sans extension) :
 			  <div style="font-size: 9px;">Si le champ est laissé vide, le nom sera celui du fichier uploadé </div>
 			  <div style="font-size: 9px;">Les espaces seront remplacés par le caractère \'_\'</div>
+			  <div style="font-size: 9px;">N\'utilisez que des caractères alphanumériques. Sinon, ça plantera, et ce sera votre faute !</div>
+
 			  <input style="width: 500px;" type="textarea" name="imgName" style="color: black"><br/><br/>
-              Description : <br/><textarea style="width: 500px;" name="imgDescription" style="color: black"></textarea>
+              Description :
+              <div style="font-size: 9px;">Le code HTML écrit ici sera interprété.</div>
+ <textarea style="width: 500px;" name="imgDescription" style="color: black"></textarea><br/><br/>
+				Catégorie :<select name="imgCat">';
 				
-              <input style="float: right" type="submit" name="Upload" value="Upload">
+foreach(listerCat() as $cat)
+	echo '<option>'.$cat.'</option>';
+	
+echo              ' </select><input style="float: right" type="submit" name="Upload" value="Upload">
 	     </fieldset>
        </form>';
-       
        
 if(isset($_FILES['imgPC']))
 {
@@ -68,16 +100,16 @@ if(isset($_FILES['imgPC']))
 		$name=time().'_'.str_replace(' ','_',$_POST['imgName']).'.'.$ext;
 		}
 		
-		if(move_uploaded_file($_FILES['imgPC']['tmp_name'], './img/'.$name)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
+		if(move_uploaded_file($_FILES['imgPC']['tmp_name'], './c/'.$_POST['imgCat'].'/'.$name)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
      	{	
-			WriteXML($name, $_POST['imgDescription']);
-			list($width, $height, $type, $attr) = getimagesize('./img/'.$name);
+			WriteXML($name, $_POST['imgDescription'], $_POST['imgCat']);
+			list($width, $height, $type, $attr) = getimagesize('./c/'.$_POST['imgCat'].'/'.$name);
 
 				echo '<h3>File uploaded !</h3>';
           		echo '[Name] '.$name.'<br/>';
 				echo '[Height] '.$height.'px<br/>';
 				echo '[Width] '.$width.'px<br/>';
-				echo '<center><img src="./img/'.$name.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
+				echo '<center><img src="./c/'.$_POST['imgCat'].'/'.$name.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
 	
      	}
      	else //Sinon (la fonction renvoie FALSE).
@@ -104,9 +136,17 @@ echo'	   <form method="POST" action="upload.php?type=URL" enctype="multipart/for
 			  <div style="font-size: 9px;">Si le champ est laissé vide, le nom sera celui du fichier uploadé </div>
 			  <div style="font-size: 9px;">Les espaces seront remplacés par le caractère \'_\'</div>
 			  <input style="width: 500px;" type="textarea" name="imgName" style="color: black"><br/><br/>
-              Description : <br/><textarea style="width: 500px;" name="imgDescription" style="color: black"></textarea><input style="float: right" type="submit" name="Upload" value="Upload">
-	      </fieldset>
-              </form><br/>';
+              Description : <br/><textarea style="width: 500px;" name="imgDescription" style="color: black"></textarea><input style="float: right" type="submit" name="Upload" value="Upload"><br/><br/>
+              	Catégorie :<select name="imgCat">';
+              	
+              	foreach(listerCat() as $cat)
+	echo '<option>'.$cat.'</option>';
+	
+	
+echo              ' </select><input style="float: right" type="submit" name="Upload" value="Upload">
+	     </fieldset>
+       </form>';
+
               
 if(empty($_POST['imgURL']))
 {
@@ -134,16 +174,16 @@ else
 				$name=time().'_'.str_replace(' ','_',$_POST['imgName']).'.'.$ext;
 			}
 			
-			if(file_put_contents('./img/'.$name, $current))
+			if(file_put_contents('./c/'.$_POST['imgCat'].'/'.$name, $current))
 			{
-				WriteXML($name, $_POST['imgDescription']);
+				WriteXML($name, $_POST['imgDescription'], $_POST['imgCat']);
 
 				echo '<h3>File uploaded !</h3>';
-				list($width, $height, $type, $attr) = getimagesize('./img/'.$name);
+				list($width, $height, $type, $attr) = getimagesize('./c/'.$_POST['imgCat'].'/'.$name);
           		echo '[Name] '.$name.'<br/>';
 				echo '[Height] '.$height.'px<br/>';
 				echo '[Width] '.$width.'px<br/>';
-				echo '<center><img src="./img/'.$name.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
+				echo '<center><img src="./c/'.$_POST['imgCat'].'/'.$name.'" width="500" height="'.round(((500*$height)/$width)).'"/></center><br/>';
 			}
 	
 			else //Sinon (la fonction renvoie FALSE).
@@ -155,6 +195,7 @@ else
 
 }
 }			
+
 
 
 function connection()
@@ -205,6 +246,7 @@ function connection()
 	}
 
 }
+
 
 function isLogin()
 {
@@ -355,6 +397,7 @@ function linear_partition_table($seq, $k) // Fonction chargée d'effectuée la p
 }
 
 
+
 function printImg($debut, $fin, $nav_width)
 {
 
@@ -411,7 +454,7 @@ function printImg($debut, $fin, $nav_width)
 				// Le '(countImg()-$u-1)' est crade. Je verrai si c'est fiable à long terme.
 			else
 	$final_string=$final_string.'
-		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt">	 <div class="txt_nom"><a href="img.php?id='.$u.'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';			$u++;
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt">	 <div class="txt_nom"><a href="img.php?name='.substr(strrchr($array_path[$u],'/'),1).'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';			$u++;
 		}
 
 
@@ -420,9 +463,14 @@ return $final_string;
 	}
 }
 
-// Gestion des pages
+////////////////////////////////////////////////////////////////////
+// Ensembles de fonctions chargées de gérer les pages             //	
+////////////////////////////////////////////////////////////////////
+function pageInfo($cat)
+{
+$m=Array();
 $pagination=20	;
-$nb_fichier=countImg();
+$nb_fichier=countImg($cat);
 
 if( isset($_GET['page']) && is_numeric($_GET['page']) )
 	$page = $_GET['page'];
@@ -438,21 +486,28 @@ if ($fin > $nb_fichier)
 $nb_page=ceil($nb_fichier/$pagination);
 	if ($nb_page==0)
 		$nb_page=1;
+		
+$m['debut']=$debut;
+$m['fin']=$fin;
+$m['page']=$page;
+$m['nbPage']=$nb_page;
 
-function printPage()
+return $m;
+}
+
+function printPage($page, $nb_page, $cat) // Affiche le bandeau de sélection des pages
 {
-global $page;
-global $nb_page;
+
 echo '<div id="page">';
 
 if($page==1 && $nb_page==1)
 	echo '[Page 1/1]';
 elseif($page==1)
-	echo '<span style="color: white";><< </span>[ Page '.$page.'/'.$nb_page.' ] <a href="index.php?page='.($page+1).'">>></a>';
+	echo '<span style="color: white";><< </span>[ Page '.$page.'/'.$nb_page.' ] <a href="view.php?page='.($page+1).'&c='.$cat.'">>></a>';
 elseif($page==$nb_page)
-	echo '<a href="index.php?page='.($page-1).'"><< </a>[ Page '.$page.'/'.$nb_page.' ]<span style="color: white";>>></span>';
+	echo '<a href="view.php?page='.($page-1).'&c='.$cat.'"><< </a>[ Page '.$page.'/'.$nb_page.' ]<span style="color: white";>>></span>';
 else
-	echo '<a href="index.php?page='.($page-1).'"><< </a>[ Page '.$page.'/'.$nb_page.' ] <a href="index.php?page='.($page+1).'">>></a>';
+	echo '<a href="view.php?page='.($page-1).'&c='.$cat.'"><< </a>[ Page '.$page.'/'.$nb_page.' ] <a href="view.php?page='.($page+1).'&c='.$cat.'">>></a>';
 echo '</div>';
 }
 
@@ -460,3 +515,191 @@ echo '</div>';
 
 
 
+
+
+
+function printCategorie($debut, $fin, $nav_width, $categorie)
+{
+	if(($fin-$debut)==1)
+	{
+		$info=getImgInfobyID(0,$categorie);
+		$array_path=getImgPath($categorie);
+		list($width, $height, $type, $attr) = getimagesize($array_path[0]);
+		if(isLogin())
+		
+		return '<center><span class="image"><div style="width:500px; height:'.((500*$height)/$width).'px" class="txt"><a href="delete.php?id=0" class="suppr"></a>	 <div class="txt_nom"><a href="img.php?name='.substr(strrchr($array_path[0],'/'),1).'&c='.$_GET['c'].'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[0].'" height="'.((500*$height)/$width).'" width="500" /></span></center>';
+
+		else
+		return '<center><span class="image"><div style="width:500px; height:'.((500*$height)/$width).'px" class="txt"><div class="txt_nom"><a href="img.php?name='.substr(strrchr($array_path[0],'/'),1).'&c='.$_GET['c'].'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[0].'" height="'.((500*$height)/$width).'" width="500" /></span></center>';
+
+	}
+	else
+	{
+	$array_path=getImgPath($categorie);
+	$sum_width=0;
+	for($i=$debut;$i<$fin;$i++)
+	{
+		list($width, $height, $type, $attr) = getimagesize($array_path[$i]);
+		$array_width[$i]=round(($width*300)/$height,0);
+		$sum_width=$sum_width+(($width*300)/$height);
+	}
+
+	$k=ceil($sum_width/$nav_width); // $k représente le nombre de "lignes" qui seront affichées.
+
+	$partition=linear_partition_table(array_values($array_width), $k);
+
+	// $partition est désormais une chaîne de caractère du type 123.456./789.10.34/1337.42 
+
+	$array_line_width=explode('./', $partition);	
+	// On récupère les largeurs des images pour chaque ligne. Ici $LigneWidth[0]=123.456
+	//							      $LigneWidth[1]=789.10.34
+	//							      $LigneWidth[2]=1337.42	
+	$u=$debut;
+	$final_string="";
+	for($i=0;$i<$k;$i++) // Pour chaque ligne
+	{
+		$img_width=explode('.',$array_line_width[$i]); // Contient la largeur des images de la ligne $i
+		$width_available=$nav_width-15-(count($img_width)+1)*5; // La largeur disponible pour placer les images est égales à :
+						      // La largeur du navigateur MOINS largeur par de scroll (15px) MOINS (nombre d'images de la ligne + 1)*5
+		$sum=array_sum($img_width);
+
+/* 	
+   On a la largeur disponible pour les images ($width_available), ainsi que la somme des largeurs des images de la ligne ($sum).
+   Il s'agit maintenant de redimensionner les images de la ligne en modulant leur hauteur afin qu'elles s'encastrent parfaitement.
+   On utilise pour cela une simple règle de trois.
+*/
+		$ideal_height=round((($width_available)*300)/$sum);
+
+		foreach($img_width as $image) // Pour chaque image...
+		{
+			$info=getImgInfobyID($u,$categorie);
+			$width_ok=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
+			if(isLogin())
+				$final_string=$final_string.'
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt"><a href="delete.php?id='.$u.'&c='.$_GET['c'].'" class="suppr"></a>	 <div class="txt_nom"><a href="img.php?name='.substr(strrchr($array_path[$u],'/'),1).'&c='.$_GET['c'].'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';
+				 // On affiche l'image.
+				// Le '(countImg()-$u-1)' est crade. Je verrai si c'est fiable à long terme.
+			else
+	$final_string=$final_string.'
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt">	 <div class="txt_nom"><a href="img.php?name='.substr(strrchr($array_path[$u],'/'),1).'&c='.$_GET['c'].'">'.$info['name'].'</a></div><div class="txt_description">'.$info['description'].'</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';			$u++;
+		}
+
+
+	}
+return $final_string;
+    }
+}
+
+
+
+function printCatImg($nav_width)
+{
+	
+	$array_cat=listerCat();
+	$sum_width=0;
+	$array_cat_buffer=$array_cat;
+	$u=0;
+	for($i=0;$i<count($array_cat);$i++)
+	{
+		$a=getImgPath($array_cat[$i]);
+		if(count($a)==0)
+		{
+			unset($array_cat_buffer[$i]);
+		}
+		else
+		{
+		$array_path[$u]=$a[0];
+		$u++;
+	    }
+	    
+	}
+	$array_cat=array_values($array_cat_buffer);
+	for($i=0;$i<count($array_path);$i++)
+	{
+		list($width, $height, $type, $attr) = getimagesize($array_path[$i]);
+		$array_width[$i]=round(($width*300)/$height,0);
+		$sum_width=$sum_width+(($width*300)/$height);
+	}
+
+	$k=ceil($sum_width/$nav_width); // $k représente le nombre de "lignes" qui seront affichées.
+
+	$partition=linear_partition_table(array_values($array_width), $k);
+
+	// $partition est désormais une chaîne de caractère du type 123.456./789.10.34/1337.42 
+
+	$array_line_width=explode('./', $partition);	
+	// On récupère les largeurs des images pour chaque ligne. Ici $LigneWidth[0]=123.456
+	//							      $LigneWidth[1]=789.10.34
+	//							      $LigneWidth[2]=1337.42	
+	$u=0;
+	$final_string="";
+	for($i=0;$i<$k;$i++) // Pour chaque ligne
+	{
+		$img_width=explode('.',$array_line_width[$i]); // Contient la largeur des images de la ligne $i
+		$width_available=$nav_width-15-(count($img_width)+1)*5; // La largeur disponible pour placer les images est égales à :
+						      // La largeur du navigateur MOINS largeur par de scroll (15px) MOINS (nombre d'images de la ligne + 1)*5
+		$sum=array_sum($img_width);
+
+/* 	
+   On a la largeur disponible pour les images ($width_available), ainsi que la somme des largeurs des images de la ligne ($sum).
+   Il s'agit maintenant de redimensionner les images de la ligne en modulant leur hauteur afin qu'elles s'encastrent parfaitement.
+   On utilise pour cela une simple règle de trois.
+*/
+		$ideal_height=round((($width_available)*300)/$sum);
+
+		foreach($img_width as $image) // Pour chaque image...
+		{
+			$width_ok=round(($ideal_height*$array_width[$u])/300); // On calcule la largeur que devrait avoir l'image avec la hauteur idéale ($ideal_height).
+				$final_string=$final_string.'
+		<span class="image"><div style="width:'.$width_ok.'px; height:'.$ideal_height.'px" class="txt"><div class="txt_nom_cat"><a href="view.php?c='.$array_cat[$u].'">'.$array_cat[$u].'</a></div><div class="txt_description">'.countImg($array_cat[$u]).' images</div></div><img src="'.$array_path[$u].'" height="'.$ideal_height.'" width="'.$width_ok.'" /></span>';
+				
+$u++;
+		}
+
+
+	}
+return $final_string;
+	
+}
+
+function supprCat()
+{
+
+ 	$listeCat=listerCat();
+ 	
+ 	for($i=0;$i<count($listeCat);$i++)
+	{
+		if(isset($_POST[$i]))
+		{
+			deleteDir($listeCat[$i]);
+		}
+	}
+	 	$listeCat=listerCat();
+
+ 		$output='<form action="cat.php" method="post" enctype="multipart/form-data"><fieldset><legend>Supprimer une catégorie</legend>';
+ 		$output.='<div style="font-size: 9px;">Attention, la catégorie ainsi que les images qu\'elle contient seront définitivement supprimés.</div><br/>';
+
+
+	for($i=0;$i<count($listeCat);$i++)
+		$output.='<input type="checkbox" name="'.$i.'" id="'.$listeCat[$i].'"/> <label for="'.$listeCat[$i].'"><a href="'.$listeCat[$i].'">'.$listeCat[$i].'</a></label><br/>';
+	
+	$output.='<br/><input type="submit" value="Supprimer les catégories cochées" /><br/></fieldset></form>';
+	echo $output;
+	
+	
+}
+
+
+function isCatExist($cat)
+{
+	$listeCat=listerCat();
+	
+	if(in_array($cat, $listeCat))
+	{
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}

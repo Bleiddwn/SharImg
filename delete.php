@@ -13,16 +13,15 @@ include_once('./inc/header.php'); ?>
 	
 	else 
 	{
-		if(!empty($_GET['id']))
+
+		if(isset($_GET['id']))
 		{	
-			deleteImgFromFolder($_GET['id']);
-			deleteImgFromXML($_GET['id']);
-			echo '<script language="JavaScript">window.location="index.php"</script>';
-		}
-		else
-		{
-			deleteCheckedFiles();
-			echo getDeleteCheckBox();
+			
+	
+			
+			deleteImgFromFolder($_GET['id'],$_GET['c']);
+			deleteImgFromXML($_GET['id'],$_GET['c']);
+			echo '<script language="JavaScript">window.location="view.php?c='.$_GET['c'].'"</script>';
 		}
 
 	}

@@ -13,12 +13,12 @@
 
 <div id="header">
 	<div id="title">
-		<a href="index.php">[ Sharimg<span style="font-size: 12px">Beta</span>] </a>
-		<span id="description">(<?php echo countImg(); ?> images)</span>
+		<a href="index.php">[ Sharimg ] </a>
+		<span id="description"><?php /* echo countImg().' images - '.countSize().'Ko</span>';*/?></span>
 
 		<span id="opt">
 			<div>
-				<a href="delete.php">[Supprimer une image] -</a>
+				<a href="cat.php">[Gérer les catégories] -</a>
 				<a href="upload.php">[Uploader une image]</a>
 			</div>
 			<?php echo print_Login(); ?>

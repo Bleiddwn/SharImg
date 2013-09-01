@@ -13,6 +13,9 @@
 include_once('model.php');
 include_once('control.php');
 
+
+
+
 include_once('./inc/header.php');
 
 $nav_width=$_GET['NavWidth'];
@@ -38,18 +41,18 @@ var onresize_actif = false;
 window.onresize = function() {
   if( onresize_actif)
     return;
-  window.location='index.php?NavWidth='+window.innerWidth+'&page='+getQuerystring('page');
+  window.location='view.php?NavWidth='+window.innerWidth+'&page='+getQuerystring('page')+'&c='+getQuerystring('c');
   onresize_actif = true;
   setTimeout(function () { onresize_actif = false; }, 1000);
 }; //Ca a pas grande importance mais du js sans ; à la fin des instructions n'est plus vraiment du js 
 
 
 
-
+	
 
 	if(window.innerWidth != getQuerystring('NavWidth'))
 	{
-	window.location='index.php?NavWidth='+window.innerWidth+'&page='+getQuerystring('page');
+  window.location='view.php?NavWidth='+window.innerWidth+'&page='+getQuerystring('page')+'&c='+getQuerystring('c');
 	}
 	//window.onresize = window.location='index.php?NavWidth='+window.innerWidth+'&page='+getQuerystring('page');
 </script>
@@ -60,9 +63,18 @@ if(!isConfig())
 
 else
 {
-	echo '<div id="page">Catégories</div>';
-	echo printCatImg($nav_width);
-	echo '<div id="page">...</div>';
+	if(isCatExist($_GET['c']))
+	{
+	$m=pageInfo($_GET['c']);
+	printPage($m['page'], $m['nbPage'], $_GET['c']);
+	echo printCategorie($m['debut'], $m['fin'],$nav_width, $_GET['c']);
+	printPage($m['page'], $m['nbPage'], $_GET['c']);
+	}
+	else
+	{
+	echo '<div id="page">Catégorie inexistante</div><div id="main">Cette catégorie n\'existe pas.</div><div id="page">...</div>';
+	}
+
 }
 
 	
